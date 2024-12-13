@@ -16,6 +16,7 @@ typedef struct WaveParameters{
     int sample_freq, sample_channels, sample_length,bit_depth;
     float freq_base, amp_depth, freq_depth, rot_freq;
     uint16_t MAX_VAL;
+    char* name;
 } WaveParameters;
 
 
@@ -23,7 +24,7 @@ void write_wave_header(FILE *file, WaveParameters* wave);
 
 void read_config();
 void generate_sample(FILE* fp, WaveParameters* params);
-void generate_package(char* name, WaveParameters* params);
+void generate_package(WaveParameters* params);
 float midi_to_freq(float num);
 void create_dir(const char* path);
 

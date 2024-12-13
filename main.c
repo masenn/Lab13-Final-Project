@@ -3,6 +3,9 @@
 #include <stdint.h>
 #include <string.h>
 #include <stdlib.h>
+#include <unistd.h> 
+#include <sys/types.h>
+#include <sys/wait.h>
 #include "wav.h"
 
 #define TEST_FREQ 440
@@ -15,7 +18,7 @@
 #define AMP_DEPTH 2
 #define AMP_FREQ 1
 
-void load_params(char* file);
+void load_params(char* file, int nprocs);
 
 double to_double(char* c) {
     char *endptr;
@@ -34,7 +37,7 @@ double to_double(char* c) {
 }
 
 int main(){
-    load_params("config.csv");
+    load_params("config.csv",3);
  
    //  int frames_per_process = total_images / nprocs;
    //  int remaining_frames = total_images % nprocs;
@@ -63,19 +66,20 @@ int main(){
    //  }
 }
 
-void load_params(char* file){
+void load_params(char* file, int nprocs){
    FILE* fp;
    fp = fopen(file,"r");
    if(fp==NULL){
       printf("Cannot find file: %s\n",file);
       return;
    }
-   // WaveParameters params[];
+   WaveParameters params[20];
    char buf[300];
    char* data[8];
    int count = 0; 
    int isHeader = 1;
    int line = 1;
+   int num_params = 0;
    while(fgets(buf,sizeof(buf),fp)!=NULL){
       //placing into the array
       char* token = strtok(buf, " \n,\r");
@@ -108,13 +112,43 @@ void load_params(char* file){
         wave.freq_depth = to_double(data[6]);
         wave.rot_freq = to_double(data[7]);
         wave.MAX_VAL = pow(2,wave.bit_depth)/2;
-
-        // printf("%s %s %s\n",data[1],data[2],data[3]);
-        generate_package(name,&wave);
+        wave.name = data[0];
+         params[count] = wave;
+         num_params++;
       } else {
          isHeader = 0; 
       }
       line++;
    }
    fclose(fp);
+   
+
+   // printf("Has files %d\n",num_params);
+   int packages_per_proc = num_params / nprocs;
+   int remaining_package = num_params % nprocs;
+
+   pid_t pids[nprocs];
+   for (int i = 0; i < nprocs; i++) {
+      printf("Beginning process %d: \n", i);
+      //Process****************************************************************
+      if ((pids[i] = fork()) == 0) { // Child process
+         int start_package = i * packages_per_proc;
+         int end_package = start_package + packages_per_proc;
+         printf("nprocs: %d -- Proc %d starts %d and ends %d\n\n",nprocs,i,start_package,end_package);
+         if (i == nprocs - 1) {
+               end_package += remaining_package; // Last process handles the extra frames
+         }
+         for(int j = start_package; j<end_package; j++){
+            generate_package(&params[j]);
+         }
+      } else if (pids[i] < 0) { // Fork failed
+         perror("fork");
+         printf("ending!\n");
+         exit(-1);
+      }
+   }
+   // Parent  waits for all children to finish
+   for (int proc = 0; proc < nprocs; proc++) {
+      wait(NULL);
+   }
 }

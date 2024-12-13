@@ -63,14 +63,15 @@ void generate_sample(FILE* fp, WaveParameters* params){
     fflush(fp);
 }
 
-void generate_package(char* name, WaveParameters* params){
+void generate_package(WaveParameters* params){
    // creating directories 
    create_dir("audio/");
     static char save_path[256];
     strcpy(save_path,"");
     printf("Starting with save path %s: \n",save_path);
+    printf("name: %s\n", params->name);
    strcat(save_path,"audio/");
-   strcat(save_path,name);
+   strcat(save_path,params->name);
 //    strcat(save_path,"/");
    create_dir(save_path);
 

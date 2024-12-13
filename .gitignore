@@ -1,0 +1,4 @@
+/audio
+*.d
+*.o
+main

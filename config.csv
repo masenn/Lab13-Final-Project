@@ -1,0 +1,4 @@
+name,samp_freq,samp_channels,samp_length,bit_depth,amp_depth,freq_depth,rot_freq
+test,8000,2,5,16,1,1,5,
+slow,8000,2,5,16,1,1,1,
+fast,8000,2,5,16,1,.3,5,

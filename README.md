@@ -36,13 +36,5 @@ As an example, an A440 sample would be denoted as ```069-A.wav```.
 # The Project: 
 While many pipe organ samples exist, there is not a sample set for the hammond organ. The hammond organ is an asset to many musical styles and I wanted to generate samples similar. Other software simulations exist, but they are very expensive. This project provides a cheap, easy, and fast way to generate samples to replicate a hammond. 
 
-### Replicating the Waveforms
-To start, we must generate a simple sine wave: 
-$$(int)2^{{bitdepth}}*sin(2\pi f_{note}*\frac{t}{f_{sample}})$$
-
-However, leslies operate on three modifications:
-- Amplitude Modulation (from the speaker spinning closer and further from the listener)
-- Frequency Modulation (the doppler effect from the rotation)
-- Phase Modulation
 
 

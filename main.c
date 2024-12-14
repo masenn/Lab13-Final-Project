@@ -8,22 +8,11 @@
 #include <sys/wait.h>
 #include "wav.h"
 
-#define TEST_FREQ 440
-#define SAMPLE_FREQ 16000
-#define NUM_SECS 5
-#define BIT_DEPTH 16
-#define NUM_CHANNELS 2
-#define VOLUME .3
-
-#define AMP_DEPTH 2
-#define AMP_FREQ 1
-
 void load_params(char* file, int nprocs);
 
 double to_double(char* c) {
     char *endptr;
     double value;
-
     // Convert string to double
     value = strtod(c, &endptr);
 
@@ -38,32 +27,6 @@ double to_double(char* c) {
 
 int main(){
     load_params("config.csv",3);
- 
-   //  int frames_per_process = total_images / nprocs;
-   //  int remaining_frames = total_images % nprocs;
-
-   //  pid_t pids[nprocs];
-   //  for (int i = 0; i < nprocs; i++) {
-	// 	//Process****************************************************************
-   //      if ((pids[i] = fork()) == 0) { // Child process
-   //          int start_frame = i * frames_per_process;
-   //          int end_frame = start_frame + frames_per_process;
-   //          if (i == nprocs - 1) {
-   //              end_frame += remaining_frames; // Last process handles the extra frames
-   //          }
-			
-
-   //          }
-   //          exit(0);
-   //      } else if (pids[i] < 0) { // Fork failed
-   //          perror("fork");
-   //          exit(-1);
-   //      }
-
-    // Parent  waits for all children to finish
-   //  for (int proc = 0; proc < nprocs; proc++) {
-   //      wait(NULL);
-   //  }
 }
 
 void load_params(char* file, int nprocs){
@@ -114,8 +77,6 @@ void load_params(char* file, int nprocs){
         wave.MAX_VAL = pow(2,wave.bit_depth)/2;
          wave.name = strdup(data[0]);  // Allocate memory and copy the name
          params[num_params] = wave;
-         printf("name at index %d: %s\n---\n",num_params,params[num_params].name);
-
          num_params++;
       } else {
          isHeader = 0; 
@@ -140,11 +101,7 @@ void load_params(char* file, int nprocs){
                end_generation += remaining_generations;
          }
 
-         printf("Process %d handling generations %d to %d\n", i, start_generation, end_generation);
-
          for (int gen = start_generation; gen < end_generation; gen++) {
-               // Replace this with the actual generation task
-               // printf("Process %d working on generation %d\n", i, gen);
                generate_package(&params[gen]);
          }
 
@@ -161,9 +118,7 @@ void load_params(char* file, int nprocs){
          wait(NULL);
       }
 
-      printf("\n\n\n\nStarting with number of params: %d\n\n\n",num_params);
       for(int i = 0; i < num_params; i++){
-         printf("Generating %s:    ", params[i].name);
          generate_package(&params[i]);
    }
 }
